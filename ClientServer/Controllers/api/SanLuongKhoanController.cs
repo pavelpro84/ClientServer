@@ -1,35 +1,44 @@
-﻿using System;
+﻿using ClientServer.Models;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using ClientServer.Models;
-using Newtonsoft.Json;
 
 namespace ClientServer.Controllers.api
 {
-    public class SanPhamController : ApiController
+    public class SanLuongKhoanController : ApiController
     {
         private NKSLKDbContext context = new NKSLKDbContext();
 
         [HttpGet]
-        public async Task<IEnumerable<SanPham>> Get()
+        public async Task<IEnumerable<NKSLK>> Get()
         {
-            List<SanPham> list = await context.SanPhams.AsNoTracking().ToListAsync();
+            List<NKSLK> list = await context.NKSLKs.AsNoTracking().ToListAsync();
             if (list == null)
             {
-                return new SanPham[] { };
+                return new NKSLK[] { };
             }
             return list;
         }
 
-        // GET api/<controller>/5
-        public async Task<SanPham> Get(int id)
+        [HttpGet]
+        [Route("slk-thang")]
+        public async Task<IEnumerable<Object>> GetThang(DateTime date)
         {
-            return await context.SanPhams.FindAsync(id);
+            SqlParameter dateParams = new SqlParameter("@ThangLamViec", date);
+            List<Object> list = await context.Database.SqlQuery<Object>("EXEC NKSLK_NhaMay @ThangLamViec", dateParams).ToListAsync();
+            return list;
+        }
+
+        // GET api/<controller>/5
+        public string Get(int id)
+        {
+            return "value";
         }
 
         // POST api/<controller>

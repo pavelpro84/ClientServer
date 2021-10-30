@@ -10,6 +10,8 @@ namespace ClientServer.Models
         public NKSLKDbContext()
             : base("name=NKSLKDbContext")
         {
+            Configuration.LazyLoadingEnabled = false;
+            Configuration.ProxyCreationEnabled = false;
         }
 
         public virtual DbSet<CongViec> CongViecs { get; set; }
