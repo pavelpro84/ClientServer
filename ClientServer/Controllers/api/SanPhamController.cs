@@ -16,13 +16,10 @@ namespace ClientServer.Controllers.api
         private NKSLKDbContext context = new NKSLKDbContext();
 
         [HttpGet]
+        [Route("/api/sanpham/all")]
         public async Task<IEnumerable<SanPham>> Get()
         {
             List<SanPham> list = await context.SanPhams.AsNoTracking().ToListAsync();
-            if (list == null)
-            {
-                return new SanPham[] { };
-            }
             return list;
         }
 
