@@ -148,6 +148,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\api\CongViecController.cs" />
+    <Compile Include="Controllers\api\LuongController.cs" />
     <Compile Include="Controllers\api\SanLuongKhoanController.cs" />
     <Compile Include="Controllers\api\NhanCongController.cs" />
     <Compile Include="Controllers\api\SanPhamController.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Models\NKSLK.cs" />
     <Compile Include="Models\NKSLKDbContext.cs" />
     <Compile Include="Models\NKSLK_ChiTiet.cs" />
+    <Compile Include="Models\QModel\NgayCong.cs" />
     <Compile Include="Models\QModel\SLK.cs" />
     <Compile Include="Models\QModel\SLKNhanCong.cs" />
     <Compile Include="Models\SanPham.cs" />
