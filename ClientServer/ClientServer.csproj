@@ -147,6 +147,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\api\CongViecController.cs" />
     <Compile Include="Controllers\api\SanLuongKhoanController.cs" />
     <Compile Include="Controllers\api\NhanCongController.cs" />
     <Compile Include="Controllers\api\SanPhamController.cs" />
