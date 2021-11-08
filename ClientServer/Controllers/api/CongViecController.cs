@@ -54,7 +54,7 @@ namespace ClientServer.Controllers.api
             congviec_01.tenCongViec = congviec.tenCongViec;
             congviec_01.heSoKhoan = congviec.heSoKhoan;
             congviec_01.donViKhoan = congviec.donViKhoan;
-            congviec_01.donGia = congviec.donGia;
+            congviec_01.donGia = congviec.heSoKhoan *126360;
             congviec_01.dinhMucLaoDong = congviec.dinhMucLaoDong;
             congviec_01.dinhMucKhoan = congviec.dinhMucKhoan;
             await context.SaveChangesAsync();

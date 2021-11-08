@@ -57,5 +57,54 @@ namespace ClientServer.Controllers.api
             var list = await context.Database.SqlQuery<SLK>(query, idParams, dateParams).ToListAsync();
             return list;
         }
+
+        // them 1 phan tu
+        [HttpPost]
+        [Route("api/nhancong/add")]
+        public async Task<NhanCong> AddCongViec(NhanCong nhancong)
+        {
+            context.NhanCongs.Add(nhancong);
+            await context.SaveChangesAsync();
+            return nhancong;
+        }
+
+        //sua 1 phan tu
+        [HttpPost]
+        [Route("api/nhancong/edit/{id}")]
+        public async Task<Boolean> EditNhanCong(NhanCong nhancong, int id)
+        {
+            NhanCong nhancong_01 = context.NhanCongs.Find(id);
+            if (nhancong_01 == null)
+            {
+                return false;
+            }
+            nhancong_01.hoTen = nhancong.hoTen;
+            nhancong_01.ngaySinh = nhancong.ngaySinh;
+            nhancong_01.gioiTinh = nhancong.gioiTinh;
+            nhancong_01.phongBan = nhancong.phongBan;
+            nhancong_01.chucVu = nhancong.chucVu;
+            nhancong_01.chucVu = nhancong.chucVu;
+            nhancong_01.queQuan = nhancong.queQuan;
+            nhancong_01.luongBaoHiem = nhancong.luongBaoHiem;
+            await context.SaveChangesAsync();
+            return true;
+
+        }
+
+        // xoa 1 phan tu
+        [HttpDelete]
+        [Route("api/nhancong/delete/{id}")]
+        public async Task<Boolean> DeleteNhanCong(int id)
+        {
+            NhanCong nhancong = context.NhanCongs.Find(id);
+            if (nhancong == null)
+            {
+                return false;
+            }
+            context.NhanCongs.Remove(nhancong);
+            await context.SaveChangesAsync();
+            return true;
+
+        }
     }
 }
