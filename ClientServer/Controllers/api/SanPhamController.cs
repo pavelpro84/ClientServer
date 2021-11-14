@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using ClientServer.Models;
+using ClientServer.Models.QModel;
 using Newtonsoft.Json;
 
 namespace ClientServer.Controllers.api
@@ -18,13 +19,49 @@ namespace ClientServer.Controllers.api
 
         [HttpGet]
         [Route("api/sanpham")]
-        public async Task<IEnumerable<SanPham>> GetAll(int? pageIndex = 0, int? pageSize = 10)
+        public async Task<PagingData> GetAll(
+            int? pageIndex = 0,
+            int? pageSize = 10,
+            string search = "",
+            string sort = "id_asc")
         {
-            return await context.SanPhams
-                .OrderBy(x => x.maSanPham)
+            var searchStr = SlugGenerator.SlugGenerator.GenerateSlug(search);
+            var list = await context.SanPhams.AsNoTracking().ToListAsync();
+            if (!String.IsNullOrEmpty(searchStr))
+            {
+                list = list.Where(x =>
+                SlugGenerator.SlugGenerator
+                    .GenerateSlug(x.tenSanPham)
+                    .Contains(searchStr))
+                    .ToList();
+            }
+            switch (sort)
+            {
+                case "name_desc":
+                    list = list.OrderByDescending(s => s.tenSanPham).ToList();
+                    break;
+                case "name_asc":
+                    list = list.OrderBy(s => s.tenSanPham).ToList();
+                    break;
+                case "id_desc":
+                    list = list.OrderByDescending(s => s.maSanPham).ToList();
+                    break;
+                case "id_asc":
+                    list = list.OrderBy(s => s.maSanPham).ToList();
+                    break;
+                default:
+                    list = list.OrderBy(s => s.maSanPham).ToList();
+                    break;
+            }
+            
+            var pagingData = new PagingData();
+            pagingData.TotalRecord = list.Count;
+            pagingData.Data = list
                 .Skip(pageIndex.Value * pageSize.Value)
                 .Take(pageSize.Value)
-                .ToListAsync();
+                .ToList();
+
+            return pagingData;
         }
 
         [HttpGet]

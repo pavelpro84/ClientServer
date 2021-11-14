@@ -18,13 +18,49 @@ namespace ClientServer.Controllers.api
 
         [HttpGet]
         [Route("api/nhancong")]
-        public async Task<IEnumerable<NhanCong>> GetAll(int? pageIndex = 0, int? pageSize = 10)
+        public async Task<PagingData> GetAll(
+            int? pageIndex = 0,
+            int? pageSize = 10,
+            string search = "",
+            string sort = "id_asc")
         {
-            return await context.NhanCongs
-                .OrderBy(x => x.maNhanCong)
+            var searchStr = SlugGenerator.SlugGenerator.GenerateSlug(search);
+            var list = await context.NhanCongs.AsNoTracking().ToListAsync();
+            if (!String.IsNullOrEmpty(searchStr))
+            {
+                list = list.Where(x =>
+                SlugGenerator.SlugGenerator
+                    .GenerateSlug(x.hoTen)
+                    .Contains(searchStr))
+                    .ToList();
+            }
+            switch (sort)
+            {
+                case "name_desc":
+                    list = list.OrderByDescending(s => s.hoTen).ToList();
+                    break;
+                case "name_asc":
+                    list = list.OrderBy(s => s.hoTen).ToList();
+                    break;
+                case "id_desc":
+                    list = list.OrderByDescending(s => s.maNhanCong).ToList();
+                    break;
+                case "id_asc":
+                    list = list.OrderBy(s => s.maNhanCong).ToList();
+                    break;
+                default:
+                    list = list.OrderBy(s => s.maNhanCong).ToList();
+                    break;
+            }
+
+            var pagingData = new PagingData();
+            pagingData.TotalRecord = list.Count;
+            pagingData.Data = list
                 .Skip(pageIndex.Value * pageSize.Value)
                 .Take(pageSize.Value)
-                .ToListAsync();
+                .ToList();
+
+            return pagingData;
         }
 
         [HttpGet]
