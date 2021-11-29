@@ -5,7 +5,7 @@ using System.Web;
 
 namespace ClientServer.Models.QModel
 {
-    public class SLK
+    public class SLKSelect
     {
         public int maNKSLK { get; set; }
         public string tenCongViec { get; set; }

@@ -1,5 +1,7 @@
 ﻿using ClientServer.Models;
 using ClientServer.Models.QModel;
+using ClientServer.Models.QModel.Response;
+using ClientServer.Models.QModel.SLK;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -37,7 +39,7 @@ namespace ClientServer.Controllers.api
             SqlParameter dateParams = new SqlParameter("@ThangLamViec", date);
             string query = "EXEC NKSLK_NhaMay @ThangLamViec";
 
-            var list = await context.Database.SqlQuery<SLK>(query, dateParams).ToListAsync();
+            var list = await context.Database.SqlQuery<SLKSelect>(query, dateParams).ToListAsync();
 
             if (!String.IsNullOrEmpty(searchStr))
             {
@@ -97,7 +99,7 @@ namespace ClientServer.Controllers.api
             SqlParameter dateParams = new SqlParameter("@Date", date);
             string query = "EXEC NKSLK_NhaMay_Tuan @Date";
 
-            var list = await context.Database.SqlQuery<SLK>(query, dateParams).ToListAsync();
+            var list = await context.Database.SqlQuery<SLKSelect>(query, dateParams).ToListAsync();
 
             if (!String.IsNullOrEmpty(searchStr))
             {
@@ -164,7 +166,7 @@ namespace ClientServer.Controllers.api
                 query = "EXEC NKSLK_NhaMay_Tuan @Date";
             }
             SqlParameter dateParams = new SqlParameter(thang.Value ? "@ThangLamViec" : "@Date", date);
-            var list = await context.Database.SqlQuery<SLK>(query, dateParams).ToListAsync();
+            var list = await context.Database.SqlQuery<SLKSelect>(query, dateParams).ToListAsync();
 
             var searchStr = SlugGenerator.SlugGenerator.GenerateSlug(search);
             if (!String.IsNullOrEmpty(searchStr))
@@ -212,13 +214,119 @@ namespace ClientServer.Controllers.api
             return pagingData;
         }
 
+        [HttpGet]
+        [Route("api/slk/day")]
+        public async Task<PagingData> GetSLKDay(
+            int? pageIndex = 0,
+            int? pageSize = 10,
+            string sort = "day_desc")
+        {
+            var list = await context.NKSLKs.ToListAsync();
+            switch (sort)
+            {
+                case "day_desc":
+                    list = list.OrderByDescending(s => s.ngay).ToList();
+                    break;
+                case "day_asc":
+                    list = list.OrderBy(s => s.ngay).ToList();
+                    break;
+                case "id_desc":
+                    list = list.OrderByDescending(s => s.maNKSLK).ToList();
+                    break;
+                case "id_asc":
+                    list = list.OrderBy(s => s.maNKSLK).ToList();
+                    break;
+                default:
+                    list = list.OrderBy(s => s.maNKSLK).ToList();
+                    break;
+            }
+
+            var pagingData = new PagingData();
+            pagingData.TotalRecord = list.Count;
+            pagingData.Data = list
+                .Skip(pageIndex.Value * pageSize.Value)
+                .Take(pageSize.Value)
+                .ToList();
+            return pagingData;
+        }
+
+        [HttpGet]
+        [Route("api/slk/find_day")]
+        public async Task<Dictionary<string, object>> FindSLKDay()
+        {
+            var today = DateTime.Today;
+            var item = await context.NKSLKs
+                .Where(t => DbFunctions.TruncateTime(t.ngay) == today)
+                .FirstOrDefaultAsync();
+
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            result.Add("dateTimeNow", today);
+            result.Add("item", item);
+
+            return result;
+        }
+
+        [HttpDelete]
+        [Route("api/slk/delete_day/{id}")]
+        public async Task<Reponse> DeleteSLKDay(int id)
+        {
+            Reponse res = new Reponse();
+            try
+            {
+                var item = await context.NKSLKs.FindAsync(id);
+                if (item == null)
+                {
+                    res.Success = false;
+                    res.Message = "Không tìm thấy ngày SLK";
+                    res.ErrorCode = 400;
+                    return res;
+                }
+
+                context.NKSLKs.Remove(item);
+                await context.SaveChangesAsync();
+
+                res.Data = item;
+                res.Success = true;
+            } catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = "Đã có lỗi";
+                res.ErrorCode = 500;
+            }
+            return res;
+        }
+
         [HttpPost]
         [Route("api/slk/add")]
-        public async Task<TimeSpan> AddNew(int maNhanCong, int maCongViec, int caLam)
+        public async Task<Reponse> AddNew(SLKAddRequest req)
         {
+            Reponse res = new Reponse();
             string caLamGioBatDau = "";
             string caLamGioKetThuc = "";
-            switch (caLam)
+
+            //validate
+            if (req.caLam <= 0 || req.caLam >= 4)
+            {
+                res.Success = false;
+                res.Message = "Ca làm không hợp lệ";
+                res.ErrorCode = 400;
+                return res;
+            }
+            if (string.IsNullOrEmpty(req.maCongViec.ToString()))
+            {
+                res.Success = false;
+                res.Message = "Công việc không thể trống";
+                res.ErrorCode = 400;
+                return res;
+            }
+            if (string.IsNullOrEmpty(req.maNhanCong.ToString()))
+            {
+                res.Success = false;
+                res.Message = "Nhân công không thể trống";
+                res.ErrorCode = 400;
+                return res;
+            }
+            switch (req.caLam)
             {
                 case 1:
                     caLamGioBatDau = "6:00:00";
@@ -234,10 +342,42 @@ namespace ClientServer.Controllers.api
                     break;
             }
 
-            TimeSpan timeBatDau = TimeSpan.Parse(caLamGioBatDau);
-            TimeSpan timeKetThuc = TimeSpan.Parse(caLamGioKetThuc);
+            try
+            {
+                var today = DateTime.Today;
+                var item = await context.NKSLKs
+                    .Where(t => DbFunctions.TruncateTime(t.ngay) >= today)
+                    .FirstOrDefaultAsync();
 
-            return timeBatDau;
+                if (item == null)
+                {
+                    item = context.NKSLKs.Add(new NKSLK
+                    {
+                        ngay = DateTime.Now,
+                    });
+                    await context.SaveChangesAsync();
+                }
+
+                TimeSpan timeBatDau = TimeSpan.Parse(caLamGioBatDau);
+                TimeSpan timeKetThuc = TimeSpan.Parse(caLamGioKetThuc);
+
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result.Add("timeBatDau", timeBatDau);
+                result.Add("timeKetThuc", timeKetThuc);
+                result.Add("today", item);
+
+
+                res.Success = true;
+                res.Data = result;
+                res.Message = "";
+            }
+            catch (Exception ex)
+            {
+                res.ErrorCode = 500;
+                res.Success = false;
+                res.Message = "Đã có lỗi";
+            }
+            return res;
         }
 
     }

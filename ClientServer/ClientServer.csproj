@@ -165,8 +165,9 @@
     <Compile Include="Models\NKSLK_ChiTiet.cs" />
     <Compile Include="Models\QModel\NgayCong.cs" />
     <Compile Include="Models\QModel\PagingData.cs" />
-    <Compile Include="Models\QModel\SLK.cs" />
-    <Compile Include="Models\QModel\SLKNhanCong.cs" />
+    <Compile Include="Models\QModel\Response\Reponse.cs" />
+    <Compile Include="Models\QModel\SLK\SLKPostRequest.cs" />
+    <Compile Include="Models\QModel\SLK\SLKSelect.cs" />
     <Compile Include="Models\SanPham.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

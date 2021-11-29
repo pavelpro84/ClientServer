@@ -72,25 +72,25 @@ namespace ClientServer.Controllers.api
 
         [HttpGet]
         [Route("api/nhancong/thang")]
-        public async Task<IEnumerable<SLK>> GetWorkInMonth(int id, string date)
+        public async Task<IEnumerable<SLKSelect>> GetWorkInMonth(int id, string date)
         {
             SqlParameter idParams = new SqlParameter("@MaNhanCong", id);
             SqlParameter dateParams = new SqlParameter("@ThangLamViec", date);
             string query = "EXEC NhatKySanLuongKhoan_TheoThang_Update @MaNhanCong, @ThangLamViec";
 
-            var list = await context.Database.SqlQuery<SLK>(query, idParams, dateParams).ToListAsync();
+            var list = await context.Database.SqlQuery<SLKSelect>(query, idParams, dateParams).ToListAsync();
             return list;
         }
 
         [HttpGet]
         [Route("api/nhancong/tuan")]
-        public async Task<IEnumerable<SLK>> GetWorkInWeek(int id, string date)
+        public async Task<IEnumerable<SLKSelect>> GetWorkInWeek(int id, string date)
         {
             SqlParameter idParams = new SqlParameter("@MaNhanCong", id);
             SqlParameter dateParams = new SqlParameter("@ThangLamViec", date);
             string query = "EXEC NhatKySanLuongKhoan_Tuan_Update @MaNhanCong, @ThangLamViec";
 
-            var list = await context.Database.SqlQuery<SLK>(query, idParams, dateParams).ToListAsync();
+            var list = await context.Database.SqlQuery<SLKSelect>(query, idParams, dateParams).ToListAsync();
             return list;
         }
 
