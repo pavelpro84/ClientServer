@@ -126,6 +126,12 @@ namespace ClientServer.Controllers.api
                 case "empl_name_asc":
                     list = list.OrderBy(s => s.hoTen).ToList();
                     break;
+                case "prod_name_desc":
+                    list = list.OrderByDescending(s => s.tenSanPham).ToList();
+                    break;
+                case "prod_name_asc":
+                    list = list.OrderBy(s => s.tenSanPham).ToList();
+                    break;
                 case "id_desc":
                     list = list.OrderByDescending(s => s.maNKSLK).ToList();
                     break;
@@ -287,7 +293,8 @@ namespace ClientServer.Controllers.api
 
                 res.Data = item;
                 res.Success = true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 res.Success = false;
                 res.Message = "Đã có lỗi";
@@ -319,6 +326,13 @@ namespace ClientServer.Controllers.api
                 res.ErrorCode = 400;
                 return res;
             }
+            if (string.IsNullOrEmpty(req.maSanPham.ToString()))
+            {
+                res.Success = false;
+                res.Message = "Sản phẩm không thể trống";
+                res.ErrorCode = 400;
+                return res;
+            }
             if (string.IsNullOrEmpty(req.maNhanCong.ToString()))
             {
                 res.Success = false;
@@ -344,6 +358,7 @@ namespace ClientServer.Controllers.api
 
             try
             {
+                //add new day to nkslk
                 var today = DateTime.Today;
                 var item = await context.NKSLKs
                     .Where(t => DbFunctions.TruncateTime(t.ngay) >= today)
@@ -355,21 +370,40 @@ namespace ClientServer.Controllers.api
                     {
                         ngay = DateTime.Now,
                     });
-                    await context.SaveChangesAsync();
                 }
 
                 TimeSpan timeBatDau = TimeSpan.Parse(caLamGioBatDau);
                 TimeSpan timeKetThuc = TimeSpan.Parse(caLamGioKetThuc);
 
-                Dictionary<string, object> result = new Dictionary<string, object>();
-                result.Add("timeBatDau", timeBatDau);
-                result.Add("timeKetThuc", timeKetThuc);
-                result.Add("today", item);
+                var nklsk_ct = new NKSLK_ChiTiet
+                {
+                    maNKSLK = item.maNKSLK,
+                    maNhanCong = req.maNhanCong,
+                    gioBatDau = timeBatDau,
+                    gioKetThuc = timeKetThuc,
+                };
+                context.NKSLK_ChiTiet.Add(nklsk_ct);
 
+                var danhmuckhoan_ct = new DanhMucKhoan_ChiTiet
+                {
+                    maNKSLK = item.maNKSLK,
+                    maCongViec = req.maCongViec,
+                    maSanPham = req.maSanPham,
+                    soLoSanPham = req.soLoSanPham,
+                    sanLuongThucTe = req.sanLuongThucTe,
+                };
+                context.DanhMucKhoan_ChiTiet.Add(danhmuckhoan_ct);
+
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result.Add("nklsk", item);
+                result.Add("nklsk_ct", nklsk_ct);
+                result.Add("danhmuckhoan_ct", danhmuckhoan_ct);
 
                 res.Success = true;
                 res.Data = result;
                 res.Message = "";
+
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
