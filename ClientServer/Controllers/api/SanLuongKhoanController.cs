@@ -381,23 +381,16 @@ namespace ClientServer.Controllers.api
                     maNhanCong = req.maNhanCong,
                     gioBatDau = timeBatDau,
                     gioKetThuc = timeKetThuc,
-                };
-                context.NKSLK_ChiTiet.Add(nklsk_ct);
-
-                var danhmuckhoan_ct = new DanhMucKhoan_ChiTiet
-                {
-                    maNKSLK = item.maNKSLK,
                     maCongViec = req.maCongViec,
                     maSanPham = req.maSanPham,
                     soLoSanPham = req.soLoSanPham,
                     sanLuongThucTe = req.sanLuongThucTe,
                 };
-                context.DanhMucKhoan_ChiTiet.Add(danhmuckhoan_ct);
+                context.NKSLK_ChiTiet.Add(nklsk_ct);
 
                 Dictionary<string, object> result = new Dictionary<string, object>();
                 result.Add("nklsk", item);
                 result.Add("nklsk_ct", nklsk_ct);
-                result.Add("danhmuckhoan_ct", danhmuckhoan_ct);
 
                 res.Success = true;
                 res.Data = result;

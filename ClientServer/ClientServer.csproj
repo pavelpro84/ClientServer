@@ -158,7 +158,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CongViec.cs" />
-    <Compile Include="Models\DanhMucKhoan_ChiTiet.cs" />
     <Compile Include="Models\NhanCong.cs" />
     <Compile Include="Models\NKSLK.cs" />
     <Compile Include="Models\NKSLKDbContext.cs" />

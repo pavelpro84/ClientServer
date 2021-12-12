@@ -12,7 +12,6 @@ namespace ClientServer.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public NKSLK()
         {
-            DanhMucKhoan_ChiTiet = new HashSet<DanhMucKhoan_ChiTiet>();
             NKSLK_ChiTiet = new HashSet<NKSLK_ChiTiet>();
         }
 
@@ -21,9 +20,6 @@ namespace ClientServer.Models
 
         [Key]
         public int maNKSLK { get; set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DanhMucKhoan_ChiTiet> DanhMucKhoan_ChiTiet { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<NKSLK_ChiTiet> NKSLK_ChiTiet { get; set; }

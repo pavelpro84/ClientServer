@@ -10,6 +10,15 @@ namespace ClientServer.Models
     {
         public int? maNKSLK { get; set; }
 
+        public int? maCongViec { get; set; }
+
+        public double? sanLuongThucTe { get; set; }
+
+        [StringLength(20)]
+        public string soLoSanPham { get; set; }
+
+        public int? maSanPham { get; set; }
+
         public int? maNhanCong { get; set; }
 
         public TimeSpan? gioBatDau { get; set; }
@@ -19,8 +28,12 @@ namespace ClientServer.Models
         [Key]
         public int maChiTiet { get; set; }
 
+        public virtual CongViec CongViec { get; set; }
+
         public virtual NhanCong NhanCong { get; set; }
 
         public virtual NKSLK NKSLK { get; set; }
+
+        public virtual SanPham SanPham { get; set; }
     }
 }

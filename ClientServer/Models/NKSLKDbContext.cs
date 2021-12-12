@@ -15,7 +15,6 @@ namespace ClientServer.Models
         }
 
         public virtual DbSet<CongViec> CongViecs { get; set; }
-        public virtual DbSet<DanhMucKhoan_ChiTiet> DanhMucKhoan_ChiTiet { get; set; }
         public virtual DbSet<NhanCong> NhanCongs { get; set; }
         public virtual DbSet<NKSLK> NKSLKs { get; set; }
         public virtual DbSet<NKSLK_ChiTiet> NKSLK_ChiTiet { get; set; }
@@ -23,7 +22,7 @@ namespace ClientServer.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DanhMucKhoan_ChiTiet>()
+            modelBuilder.Entity<NKSLK_ChiTiet>()
                 .Property(e => e.soLoSanPham)
                 .IsUnicode(false);
 

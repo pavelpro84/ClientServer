@@ -179,9 +179,9 @@ namespace ClientServer.Controllers.api
             Reponse res = new Reponse();
             try
             {
-                string query = @"SELECT CongViec.maCongViec, CongViec.tenCongViec, Count(DanhMucKhoan_ChiTiet.maNKSLK) AS SoLuong
-                FROM CongViec JOIN DanhMucKhoan_ChiTiet
-                ON CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+                string query = @"SELECT CongViec.maCongViec, CongViec.tenCongViec, Count(NKSLK_ChiTiet.maNKSLK) AS SoLuong
+                FROM CongViec JOIN NKSLK_ChiTiet
+                ON CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
                 GROUP BY CongViec.maCongViec, CongViec.tenCongViec
                 ORDER BY SoLuong DESC";
 
