@@ -1,5 +1,7 @@
 ﻿using ClientServer.Models;
 using ClientServer.Models.QModel;
+using ClientServer.Models.QModel.CongViec;
+using ClientServer.Models.QModel.Response;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -141,6 +143,100 @@ namespace ClientServer.Controllers.api
             await context.SaveChangesAsync();
             return true;
 
+        }
+
+        [HttpGet]
+        [Route("api/nhancong/age")]
+        public async Task<Reponse> GetNC_Age(int? start = 30, int? end = 45)
+        {
+            Reponse res = new Reponse();
+            try
+            {
+                string query = @"SELECT maNhanCong, hoTen, ngaySinh, queQuan, DATEDIFF(DAY, NhanCong.ngaySinh, GETDATE()) / 365 AS Tuoi FROM NhanCong
+                    WHERE DATEDIFF(DAY, ngaySinh, GETDATE()) 
+                    BETWEEN " + start + " * 365 AND " + end + " * 365";
+
+                var list = await context.Database.SqlQuery<NhanCongRes>(query).ToListAsync();
+
+                res.Data = list;
+                res.Success = true;
+            }
+            catch (Exception ex)
+            {
+                res.Data = ex;
+                res.ErrorCode = 400;
+                res.Message = "Lỗi";
+                res.Success = false;
+            }
+            return res;
+        }
+
+        [HttpGet]
+        [Route("api/nhancong/retired")]
+        public async Task<Reponse> GetNC_Retired(string gender = "nam")
+        {
+            Reponse res = new Reponse();
+            try
+            {
+                int tuoi = 54;
+                if (gender.ToLower().Equals("nam")) tuoi = 54;
+                else if (gender.ToLower().Equals("nu")) tuoi = 49;
+
+                string query = @"WITH NKSLK_NHANCONG_TUOI(maNhanCong, hoTen, gioiTinh, Tuoi) AS (
+                            SELECT maNhanCong, hoTen, gioiTinh,
+                            DATEDIFF(year, NhanCong.ngaySinh, GETDATE()) AS Tuoi
+                            FROM NhanCong
+                        )
+                        SELECT * FROM NhanCong JOIN NKSLK_NHANCONG_TUOI
+                        ON NhanCong.maNhanCong = NKSLK_NHANCONG_TUOI.maNhanCong
+                        WHERE NhanCong.gioiTinh = N'" + gender + @"'
+                        AND NKSLK_NHANCONG_TUOI.Tuoi + 1 = " + tuoi;
+
+                var list = await context.Database
+                    .SqlQuery<NhanCong>(query)
+                    .ToListAsync();
+
+                res.Data = list;
+                res.Success = true;
+            }
+            catch (Exception ex)
+            {
+                res.Data = ex;
+                res.ErrorCode = 400;
+                res.Message = "Lỗi";
+                res.Success = false;
+            }
+            return res;
+        }
+
+        [HttpGet]
+        [Route("api/nhancong/shift")]
+        public async Task<Reponse> GetNC_Shift(int caLam = 3)
+        {
+            Reponse res = new Reponse();
+            try
+            {
+                string gioBatDau = "22:00:00";
+                string gioKetThuc = "6:00:00";
+
+
+                string query = "SELECT nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan FROM NhanCong nc, NKSLK_ChiTiet ct, NKSLK nk WHERE nc.maNhanCong = ct.maNhanCong AND nk.maNKSLK = ct.maNKSLK AND CONVERT(TIME, ct.gioBatDau) >= CONVERT(TIME, '" + gioBatDau + "') AND CONVERT(TIME, ct.gioKetThuc) <= CONVERT(TIME, '" + gioKetThuc + "') GROUP BY nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan";
+
+                var list = await context.Database
+                    .SqlQuery<NhanCongRes>(query)
+                    .ToListAsync();
+
+                res.Data = list;
+                res.Success = true;
+            }
+            catch (Exception ex)
+            {
+                res.Data = ex;
+                res.ErrorCode = 400;
+                res.Message = "Lỗi";
+                res.Success = false;
+            }
+            return res;
         }
     }
 }

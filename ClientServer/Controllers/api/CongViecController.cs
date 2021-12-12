@@ -1,5 +1,7 @@
 ﻿using ClientServer.Models;
 using ClientServer.Models.QModel;
+using ClientServer.Models.QModel.CongViec;
+using ClientServer.Models.QModel.Response;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -111,7 +113,7 @@ namespace ClientServer.Controllers.api
         // xoa 1 phan tu
         [HttpDelete]
         [Route("api/congviec/delete/{id}")]
-        public async  Task<Boolean> DeleteCongViec(int id)
+        public async Task<Boolean> DeleteCongViec(int id)
         {
             CongViec congviec = context.CongViecs.Find(id);
             if (congviec == null)
@@ -120,8 +122,81 @@ namespace ClientServer.Controllers.api
             }
             context.CongViecs.Remove(congviec);
             await context.SaveChangesAsync();
-            return true ;
+            return true;
 
+        }
+
+        [HttpGet]
+        [Route("api/congviec/most")]
+        public async Task<Reponse> GetCVMost(string dongia = "MAX")
+        {
+            Reponse res = new Reponse();
+            try
+            {
+                var list = await context.CongViecs.SqlQuery("SELECT * FROM CongViec WHERE donGia = " +
+               "(SELECT " + dongia + "(donGia) FROM CongViec)").ToListAsync();
+
+                res.Data = list;
+                res.Success = true;
+            }
+            catch (Exception ex)
+            {
+                res.Data = ex;
+                res.ErrorCode = 400;
+                res.Message = "Lỗi";
+                res.Success = false;
+            }
+            return res;
+        }
+
+        [HttpGet]
+        [Route("api/congviec/avg")]
+        public async Task<Reponse> GetCVAVG(string type = "greater")
+        {
+            Reponse res = new Reponse();
+            try
+            {
+                var compare = type.Equals("greater") ? ">" : "<";
+                var list = await context.CongViecs.SqlQuery("SELECT * FROM CongViec cv WHERE cv.donGia " + compare + " (SELECT AVG(donGia) FROM CongViec)").ToListAsync();
+
+                res.Data = list;
+                res.Success = true;
+            }
+            catch (Exception ex)
+            {
+                res.Data = ex;
+                res.ErrorCode = 400;
+                res.Message = "Lỗi";
+                res.Success = false;
+            }
+            return res;
+        }
+
+        [HttpGet]
+        [Route("api/congviec/slk_most")]
+        public async Task<Reponse> GetCV_SLKMost()
+        {
+            Reponse res = new Reponse();
+            try
+            {
+                string query = @"SELECT CongViec.maCongViec, CongViec.tenCongViec, Count(DanhMucKhoan_ChiTiet.maNKSLK) AS SoLuong
+                FROM CongViec JOIN DanhMucKhoan_ChiTiet
+                ON CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+                GROUP BY CongViec.maCongViec, CongViec.tenCongViec
+                ORDER BY SoLuong DESC";
+
+                var list = await context.Database.SqlQuery<CongViecRes>(query).ToListAsync();
+                res.Data = list;
+                res.Success = true;
+            }
+            catch (Exception ex)
+            {
+                res.Data = ex;
+                res.ErrorCode = 400;
+                res.Message = "Lỗi";
+                res.Success = false;
+            }
+            return res;
         }
     }
 }

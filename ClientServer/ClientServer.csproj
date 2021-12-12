@@ -163,6 +163,8 @@
     <Compile Include="Models\NKSLK.cs" />
     <Compile Include="Models\NKSLKDbContext.cs" />
     <Compile Include="Models\NKSLK_ChiTiet.cs" />
+    <Compile Include="Models\QModel\NhanCong\NhanCong.cs" />
+    <Compile Include="Models\QModel\CongViec\CongViec.cs" />
     <Compile Include="Models\QModel\NgayCong.cs" />
     <Compile Include="Models\QModel\PagingData.cs" />
     <Compile Include="Models\QModel\Response\Reponse.cs" />
