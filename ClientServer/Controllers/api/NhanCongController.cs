@@ -219,6 +219,21 @@ namespace ClientServer.Controllers.api
                 string gioBatDau = "22:00:00";
                 string gioKetThuc = "6:00:00";
 
+                switch (caLam)
+                {
+                    case 1:
+                        gioBatDau = "6:00:00";
+                        gioKetThuc = "14:00:00"; ;
+                        break;
+                    case 2:
+                        gioBatDau = "14:00:00";
+                        gioKetThuc = "22:00:00";
+                        break;
+                    case 3:
+                        gioBatDau = "22:00:00";
+                        gioKetThuc = "6:00:00";
+                        break;
+                }
 
                 string query = "SELECT nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan " +
                     "FROM NhanCong nc, NKSLK_ChiTiet ct, NKSLK nk WHERE nc.maNhanCong = ct.maNhanCong AND nk.maNKSLK = ct.maNKSLK AND CONVERT(TIME, ct.gioBatDau) >= CONVERT(TIME, '" + gioBatDau + "') AND CONVERT(TIME, ct.gioKetThuc) <= CONVERT(TIME, '" + gioKetThuc + "') GROUP BY nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan";
