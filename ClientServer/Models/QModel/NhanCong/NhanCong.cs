@@ -9,8 +9,8 @@ namespace ClientServer.Models.QModel.CongViec
     {
         public int maNhanCong { get; set; }
         public string hoTen { get; set; }
-        public DateTime ngaySinh { get; set; }
-        public string queQuan { get; set; }
+        public DateTime? ngaySinh { get; set; }
+        public string? queQuan { get; set; }
         public int Tuoi { get; set; }
     }
 }

@@ -220,7 +220,8 @@ namespace ClientServer.Controllers.api
                 string gioKetThuc = "6:00:00";
 
 
-                string query = "SELECT nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan FROM NhanCong nc, NKSLK_ChiTiet ct, NKSLK nk WHERE nc.maNhanCong = ct.maNhanCong AND nk.maNKSLK = ct.maNKSLK AND CONVERT(TIME, ct.gioBatDau) >= CONVERT(TIME, '" + gioBatDau + "') AND CONVERT(TIME, ct.gioKetThuc) <= CONVERT(TIME, '" + gioKetThuc + "') GROUP BY nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan";
+                string query = "SELECT nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan " +
+                    "FROM NhanCong nc, NKSLK_ChiTiet ct, NKSLK nk WHERE nc.maNhanCong = ct.maNhanCong AND nk.maNKSLK = ct.maNKSLK AND CONVERT(TIME, ct.gioBatDau) >= CONVERT(TIME, '" + gioBatDau + "') AND CONVERT(TIME, ct.gioKetThuc) <= CONVERT(TIME, '" + gioKetThuc + "') GROUP BY nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan";
 
                 var list = await context.Database
                     .SqlQuery<NhanCongRes>(query)
