@@ -211,7 +211,7 @@ namespace ClientServer.Controllers.api
 
         [HttpGet]
         [Route("api/nhancong/shift")]
-        public async Task<Reponse> GetNC_Shift(int caLam = 3)
+        public async Task<Reponse> GetNC_Shift(string date, int caLam = 3)
         {
             Reponse res = new Reponse();
             try
@@ -236,7 +236,7 @@ namespace ClientServer.Controllers.api
                 }
 
                 string query = "SELECT nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan " +
-                    "FROM NhanCong nc, NKSLK_ChiTiet ct, NKSLK nk WHERE nc.maNhanCong = ct.maNhanCong AND nk.maNKSLK = ct.maNKSLK AND CONVERT(TIME, ct.gioBatDau) >= CONVERT(TIME, '" + gioBatDau + "') AND CONVERT(TIME, ct.gioKetThuc) <= CONVERT(TIME, '" + gioKetThuc + "') GROUP BY nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan";
+                    "FROM NhanCong nc, NKSLK_ChiTiet ct, NKSLK nk WHERE nc.maNhanCong = ct.maNhanCong AND nk.maNKSLK = ct.maNKSLK AND CONVERT(TIME, ct.gioBatDau) >= CONVERT(TIME, '" + gioBatDau + "') AND CONVERT(TIME, ct.gioKetThuc) <= CONVERT(TIME, '" + gioKetThuc + "') AND nk.ngay = '" + date + "' GROUP BY nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan";
 
                 var list = await context.Database
                     .SqlQuery<NhanCongRes>(query)
