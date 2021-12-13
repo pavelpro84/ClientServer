@@ -18,10 +18,23 @@ namespace ClientServer.Controllers.api
         [Route("api/luong/ngaycong")]
         public async Task<IEnumerable<NgayCong>> GetSLKThang(string date)
         {
-            SqlParameter dateParams = new SqlParameter("@Date", date);
-            string query = "EXEC Count_Ngay_Cong @Date";
+            string query = $"DECLARE @DATE DATETIME='{date}';"
+                 +
+                 @"SELECT SUM(
+                    CASE WHEN (CONVERT(TIME, NKSLK_ChiTiet.gioBatDau) >= CONVERT(TIME, '22:00:00') 
+                        AND CONVERT(TIME, NKSLK_ChiTiet.gioKetThuc) <= CONVERT(TIME, '6:00:00'))
+                    THEN (24 - DATEPART(hour,NKSLK_ChiTiet.gioBatDau) + DATEPART(hour,NKSLK_ChiTiet.gioKetThuc)) / 8 * 1.3
+                    ELSE ABS(DATEDIFF(HOUR, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc)) / 8
+                    END
+                )as SoCong, NhanCong.hoTen, NhanCong.maNhanCong
+                FROM NhanCong, NKSLK, NKSLK_ChiTiet
+                WHERE NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
+                and NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
+                AND NKSLK.ngay BETWEEN @DATE-DAY(@DATE)+1 and EOMONTH(@DATE)
+                Group by NhanCong.hoTen, NhanCong.maNhanCong";
 
-            var list = await context.Database.SqlQuery<NgayCong>(query, dateParams).ToListAsync();
+            var list = await context.Database.SqlQuery<NgayCong>(query).ToListAsync();
+
             return list;
         }
 
