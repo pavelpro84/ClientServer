@@ -73,9 +73,9 @@ namespace ClientServer.Controllers.api
 
         [HttpGet]
         [Route("api/sanpham/ndk")]
-        public async Task<IEnumerable<SanPham>> GetProductNDK()
+        public async Task<IEnumerable<SanPham>> GetProductNDK(string day)
         {
-            string query = "SELECT * FROM SanPham WHERE DATEDIFF(DAY, ngayDangKy, '08-15-2019') > 0";
+            string query = "SELECT * FROM SanPham WHERE DATEDIFF(DAY, ngayDangKy,'" + day + "') > 0";
 
             var list = await context.Database.SqlQuery<SanPham>(query).ToListAsync();
             return list;
@@ -83,10 +83,9 @@ namespace ClientServer.Controllers.api
 
         [HttpGet]
         [Route("api/sanpham/hsd")]
-        public async Task<IEnumerable<SanPham>> GetProductHSD()
+        public async Task<IEnumerable<SanPham>> GetProductHSD(int daysLeft)
         {
-            string query = "SELECT *, DATEDIFF(DAY, SanPham.ngaySanXuat, SanPham.hanSuDung) AS NgayConLai FROM SanPham WHERE DATEDIFF(DAY, SanPham.ngaySanXuat, SanPham.hanSuDung) > 365";
-
+            string query = "SELECT *, DATEDIFF(DAY, SanPham.ngaySanXuat, SanPham.hanSuDung) AS NgayConLai FROM SanPham WHERE DATEDIFF(DAY, SanPham.ngaySanXuat, SanPham.hanSuDung) > " + daysLeft;
             var list = await context.Database.SqlQuery<SanPham>(query).ToListAsync();
             return list;
         }
